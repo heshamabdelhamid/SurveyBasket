@@ -5,7 +5,7 @@ namespace SurveyBasket.Services
     public class PollService : IPollService
     {
         private static readonly List<Poll> _polls = [
-            new Poll() { Id = 1, Title = "test title", Description = "description"}
+            new Poll { Id = 1, Title = "test title", Description = "description"}
         ];
 
         public IEnumerable<Poll> GetAll() => _polls;

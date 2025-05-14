@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SurveyBasket.Contracts.Requests;
 using SurveyBasket.Entities;
+using SurveyBasket.Mapping;
 using SurveyBasket.Services;
 
 namespace SurveyBasket.Controllers
@@ -12,31 +14,31 @@ namespace SurveyBasket.Controllers
         private readonly IPollService _pollService = pollService;
 
         [HttpGet("")]
-        public IActionResult GetAll() => Ok(_pollService.GetAll());
+        public IActionResult GetAll() => Ok(_pollService.GetAll().ToResponse());
         
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get([FromRoute] int id)
         {
             var poll = _pollService.Get(id);
-            return poll is null ? NotFound() : Ok(poll);
+            return poll is null ? NotFound() : Ok(poll.ToResponse());
         }
 
         [HttpPost("")]
-        public IActionResult Add(Poll request)
+        public IActionResult Add([FromBody] CreatePollRequest request)
         {
-            var poll = _pollService.Add(request);
+            var poll = _pollService.Add(request.ToEntity());
             return CreatedAtAction(nameof(Get), new { id = poll.Id }, poll);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Poll request)
+        public IActionResult Update([FromRoute] int id, [FromBody] CreatePollRequest request)
         {
-            var isUpdated = _pollService.Update(id, request);
+            var isUpdated = _pollService.Update(id, request.ToEntity());
             return isUpdated ? NoContent() : NotFound();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete([FromRoute] int id)
         {
             var isDeleted = _pollService.Delete(id);
             return isDeleted ? NoContent() : NotFound();
