@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
 using SurveyBasket.Contracts.Requests;
+using SurveyBasket.Contracts.Responses;
 using SurveyBasket.Entities;
 using SurveyBasket.Mapping;
 using SurveyBasket.Services;
@@ -20,6 +22,12 @@ namespace SurveyBasket.Controllers
         public IActionResult Get([FromRoute] int id)
         {
             var poll = _pollService.Get(id);
+
+            //mapster mapping 
+            //var config = new TypeAdapterConfig();
+            //config.NewConfig<Poll, PollResponse>().Map(dest => dest.Notes, src => src.Description);
+
+            //manual mapping
             return poll is null ? NotFound() : Ok(poll.ToResponse());
         }
 
@@ -42,6 +50,20 @@ namespace SurveyBasket.Controllers
         {
             var isDeleted = _pollService.Delete(id);
             return isDeleted ? NoContent() : NotFound();
+        }
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            var student = new Student
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                //DateOfBirth = new DateTime(2000, 1, 1)
+            };
+
+            return Ok(student.Adapt<StudentResponse>());
         }
     }
 }

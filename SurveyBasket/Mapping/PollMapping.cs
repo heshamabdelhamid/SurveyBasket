@@ -12,7 +12,7 @@ namespace SurveyBasket.Mapping
             {
                 Id = poll.Id,
                 Title = poll.Title,
-                Description = poll.Description
+                Notes = poll.Description
             };
         }
 
@@ -23,7 +23,8 @@ namespace SurveyBasket.Mapping
 
         public static Poll ToEntity(this CreatePollRequest request)
         {
-            return new () {
+            return new()
+            {
                 Title = request.Title,
                 Description = request.Description
             };
