@@ -1,22 +1,8 @@
-using Mapster;
-using MapsterMapper;
-using SurveyBasket.Services;
-using System.Reflection;
+using SurveyBasket;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-builder.Services.AddScoped<IPollService, PollService>();
-
-//Add mapster
-//var MappingConfig = TypeAdapterConfig.GlobalSettings;
-//MappingConfig.Scan(Assembly.GetExecutingAssembly());
-//builder.Services.AddSingleton<IMapper>(new Mapper(MappingConfig));
+builder.Services.AddDependencies(builder.Configuration);
 
 var app = builder.Build();
 
@@ -27,9 +13,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

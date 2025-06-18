@@ -12,7 +12,10 @@ namespace SurveyBasket.Mapping
             {
                 Id = poll.Id,
                 Title = poll.Title,
-                Notes = poll.Description
+                Notes = poll.Summary,
+                Published = poll.IsPublished,
+                StartAt = poll.StartsAt,
+                EndAt = poll.EndsAt
             };
         }
 
@@ -26,7 +29,22 @@ namespace SurveyBasket.Mapping
             return new()
             {
                 Title = request.Title,
-                Description = request.Description
+                Summary = request.description,
+                IsPublished = request.Published,
+                StartsAt =  request.StartsAt,
+                EndsAt = request.EndsAt
+            };
+        }
+
+        public static Poll ToEntity(this UpdatePollRequest request)
+        {
+            return new()
+            {
+                Title = request.Title,
+                Summary = request.description,
+                IsPublished = request.Published,
+                StartsAt = request.StartsAt,
+                EndsAt = request.EndsAt
             };
         }
     }

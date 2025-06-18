@@ -1,8 +1,5 @@
-﻿using Mapster;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SurveyBasket.Contracts.Requests;
-using SurveyBasket.Contracts.Responses;
-using SurveyBasket.Entities;
 using SurveyBasket.Mapping;
 using SurveyBasket.Services;
 
@@ -10,60 +7,50 @@ namespace SurveyBasket.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
     public class PollsController(IPollService pollService) : ControllerBase
     {
         private readonly IPollService _pollService = pollService;
-
+        
         [HttpGet("")]
-        public IActionResult GetAll() => Ok(_pollService.GetAll().ToResponse());
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        {
+            var polls = await _pollService.GetAllAsync(cancellationToken);
+            return Ok( polls.ToResponse());
+        }
         
         [HttpGet("{id}")]
-        public IActionResult Get([FromRoute] int id)
+        public async Task<IActionResult> Get([FromRoute] int id,CancellationToken cancellationToken)
         {
-            var poll = _pollService.Get(id);
-
-            //mapster mapping 
-            //var config = new TypeAdapterConfig();
-            //config.NewConfig<Poll, PollResponse>().Map(dest => dest.Notes, src => src.Description);
-
-            //manual mapping
+            var poll = await _pollService.GetAsync(id,cancellationToken);
             return poll is null ? NotFound() : Ok(poll.ToResponse());
         }
-
+        
         [HttpPost("")]
-        public IActionResult Add([FromBody] CreatePollRequest request)
+        public async Task<IActionResult> Add([FromBody] CreatePollRequest request,CancellationToken cancellationToken)
         {
-            var poll = _pollService.Add(request.ToEntity());
-            return CreatedAtAction(nameof(Get), new { id = poll.Id }, poll);
+            var poll = await _pollService.AddAsync(request.ToEntity(), cancellationToken);
+            return CreatedAtAction(nameof(Get), new { id = poll.Id }, poll.ToResponse());
         }
-
+        
         [HttpPut("{id}")]
-        public IActionResult Update([FromRoute] int id, [FromBody] CreatePollRequest request)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdatePollRequest request, CancellationToken cancellationToken)
         {
-            var isUpdated = _pollService.Update(id, request.ToEntity());
+            var isUpdated = await _pollService.UpdateAsync(id, request.ToEntity(), cancellationToken);
             return isUpdated ? NoContent() : NotFound();
         }
-
+        
         [HttpDelete("{id}")]
-        public IActionResult Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var isDeleted = _pollService.Delete(id);
+            var isDeleted = await _pollService.DeleteAsync(id, cancellationToken);
             return isDeleted ? NoContent() : NotFound();
         }
 
-        [HttpGet("test")]
-        public IActionResult Test()
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> TogglePublishAsync(int id, CancellationToken cancellationToken)
         {
-            var student = new Student
-            {
-                Id = 1,
-                FirstName = "John",
-                LastName = "Doe",
-                //DateOfBirth = new DateTime(2000, 1, 1)
-            };
-
-            return Ok(student.Adapt<StudentResponse>());
+            var isUpdated = await _pollService.TogglePublishAsync(id, cancellationToken); 
+            return isUpdated ? NoContent() : NotFound();
         }
     }
 }
