@@ -1,11 +1,13 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SurveyBasket.Entities;
 using SurveyBasket.Persistence.EntitiesConfigurations;
 
 namespace SurveyBasket.Persistence;
 
-public class SurveyBasketDbContext(DbContextOptions<SurveyBasketDbContext> options) : DbContext(options)
+public class SurveyBasketDbContext(DbContextOptions<SurveyBasketDbContext> options)
+        :IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Poll> Polls { get; set; }
 
@@ -22,7 +24,6 @@ public class SurveyBasketDbContext(DbContextOptions<SurveyBasketDbContext> optio
     /// </remarks>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-         
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
     }

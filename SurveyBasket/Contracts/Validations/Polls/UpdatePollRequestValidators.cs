@@ -1,7 +1,7 @@
 using FluentValidation;
-using SurveyBasket.Contracts.Requests;
+using SurveyBasket.Contracts.Requests.Polls;
 
-namespace SurveyBasket.Contracts.Validations;
+namespace SurveyBasket.Contracts.Validations.Polls;
 
 public class UpdatePollRequestValidators : AbstractValidator<UpdatePollRequest>
 {
@@ -13,7 +13,7 @@ public class UpdatePollRequestValidators : AbstractValidator<UpdatePollRequest>
             .Length(3, 100)
             .WithMessage("Title must be between {MinLength} and {MaxLength} characters, you entered {PropertyValue} [{TotalLength}].");
             
-        RuleFor(x => x.description)
+        RuleFor(x => x.Description)
             .NotEmpty()
             .WithMessage("{PropertyName} is required.")
             .Length(5, 1000)

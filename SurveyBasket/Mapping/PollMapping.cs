@@ -1,5 +1,5 @@
-﻿using SurveyBasket.Contracts.Requests;
-using SurveyBasket.Contracts.Responses;
+﻿using SurveyBasket.Contracts.Requests.Polls;
+using SurveyBasket.Contracts.Responses.Polls;
 using SurveyBasket.Entities;
 
 namespace SurveyBasket.Mapping
@@ -8,15 +8,13 @@ namespace SurveyBasket.Mapping
     {
         public static PollResponse ToResponse(this Poll poll)
         {
-            return new()
-            {
-                Id = poll.Id,
-                Title = poll.Title,
-                Notes = poll.Summary,
-                Published = poll.IsPublished,
-                StartAt = poll.StartsAt,
-                EndAt = poll.EndsAt
-            };
+            return new(
+                poll.Id,
+                poll.Title,
+                poll.Summary ?? string.Empty,
+                poll.IsPublished,
+                poll.StartsAt,
+                poll.EndsAt);
         }
 
         public static IEnumerable<PollResponse> ToResponse(this IEnumerable<Poll> polls)
@@ -29,7 +27,7 @@ namespace SurveyBasket.Mapping
             return new()
             {
                 Title = request.Title,
-                Summary = request.description,
+                Summary = request.Description,
                 IsPublished = request.Published,
                 StartsAt =  request.StartsAt,
                 EndsAt = request.EndsAt
@@ -38,10 +36,10 @@ namespace SurveyBasket.Mapping
 
         public static Poll ToEntity(this UpdatePollRequest request)
         {
-            return new()
+            return new ()
             {
                 Title = request.Title,
-                Summary = request.description,
+                Summary = request.Description,
                 IsPublished = request.Published,
                 StartsAt = request.StartsAt,
                 EndsAt = request.EndsAt
