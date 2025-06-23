@@ -16,8 +16,9 @@ namespace SurveyBasket;
 
 public static class DependencyInjection
 {
-    
-    public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
+
+    public static IServiceCollection AddDependencies(this IServiceCollection services,
+        IConfiguration configuration)
     {
         // Add services to the container.
         services.AddControllers();
@@ -30,11 +31,11 @@ public static class DependencyInjection
             .AddMapsterConfig()
             .AddFluentValidationConfig()
             .AddDatabaseConfig(configuration)
-            .AddAuthConfig();
-        
+            .AddAuthConfig(configuration);
+
         return services;
     }
-    
+
     private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
     {
         //Add mapster
@@ -43,10 +44,10 @@ public static class DependencyInjection
         //services.AddSingleton<IMapper>(new Mapper(MappingConfig));
         return services;
     }
-    
+
     private static IServiceCollection AddFluentValidationConfig(this IServiceCollection services)
     {
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly()) .AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly()).AddFluentValidationAutoValidation();
         return services;
     }
 
@@ -59,12 +60,21 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddAuthConfig(this IServiceCollection services)
+    private static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<SurveyBasketDbContext>();
-        
+
         services.AddSingleton<IJwtProvider, JwtProvider>();
+
+        //services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        var jwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
 
         services.AddAuthentication(options =>
             {
@@ -80,12 +90,12 @@ public static class DependencyInjection
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("n5Q3uxkVxkbDxoSvuTuVYkLnWxKV7D9q")),
-                    ValidIssuer = "SurveyBasketApplication",
-                    ValidAudience = "SurveyBasket Users"
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Key!)),
+                    ValidIssuer = jwtSettings?.Issuer,
+                    ValidAudience = jwtSettings?.Audience,
                 };
             });
-        
+
         return services;
     }
 }

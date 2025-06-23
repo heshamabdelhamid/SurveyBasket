@@ -12,7 +12,7 @@ public class UpdatePollRequestValidators : AbstractValidator<UpdatePollRequest>
             .WithMessage("{PropertyName} is required.")
             .Length(3, 100)
             .WithMessage("Title must be between {MinLength} and {MaxLength} characters, you entered {PropertyValue} [{TotalLength}].");
-            
+
         RuleFor(x => x.Description)
             .NotEmpty()
             .WithMessage("{PropertyName} is required.")
@@ -22,7 +22,7 @@ public class UpdatePollRequestValidators : AbstractValidator<UpdatePollRequest>
         RuleFor(x => x.StartsAt)
             .NotEmpty()
             .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today));
-        
+
         RuleFor(x => x.EndsAt)
             .NotEmpty()
             .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today));

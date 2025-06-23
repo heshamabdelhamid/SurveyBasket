@@ -1,11 +1,10 @@
-﻿namespace SurveyBasket.Contracts.Responses.Polls
-{
-    public record PollResponse(
-        int Id,
-        string Title,
-        string Notes,
-        bool Published,
-        DateOnly StartAt,
-        DateOnly EndAt
-    );
-}
+﻿namespace SurveyBasket.Contracts.Responses.Polls;
+
+public record PollResponse(
+    int Id,
+    string Title,
+    string Notes,
+    bool Published,
+    DateOnly StartAt,
+    DateOnly EndAt
+);

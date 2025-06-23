@@ -1,6 +1,6 @@
 namespace SurveyBasket.Contracts.Responses.Auth;
 
-public record AuthResponse (
+public record AuthResponse(
         string Id,
         string Email,
         string FirstName,

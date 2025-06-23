@@ -7,7 +7,7 @@ using SurveyBasket.Persistence.EntitiesConfigurations;
 namespace SurveyBasket.Persistence;
 
 public class SurveyBasketDbContext(DbContextOptions<SurveyBasketDbContext> options)
-        :IdentityDbContext<ApplicationUser>(options)
+        : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Poll> Polls { get; set; }
 
@@ -27,7 +27,7 @@ public class SurveyBasketDbContext(DbContextOptions<SurveyBasketDbContext> optio
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
     }
-   
+
     /*
      * Instead of registering each entity configuration manually like:
      *     modelBuilder.ApplyConfiguration(new PollConfiguration());

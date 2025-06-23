@@ -7,5 +7,5 @@ public record UpdatePollRequest
     public bool Published { get; init; }
     public DateOnly StartsAt { get; init; }
     public DateOnly EndsAt { get; init; }
-    
+
 }
