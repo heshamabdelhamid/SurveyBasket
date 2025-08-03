@@ -28,7 +28,6 @@ public static class PollMapping
         {
             Title = request.Title,
             Summary = request.Description,
-            IsPublished = request.Published,
             StartsAt = request.StartsAt,
             EndsAt = request.EndsAt
         };
@@ -40,7 +39,6 @@ public static class PollMapping
         {
             Title = request.Title,
             Summary = request.Description,
-            IsPublished = request.Published,
             StartsAt = request.StartsAt,
             EndsAt = request.EndsAt
         };

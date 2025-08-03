@@ -2,7 +2,6 @@ using System.Reflection;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SurveyBasket.Entities;
-using SurveyBasket.Persistence.EntitiesConfigurations;
 
 namespace SurveyBasket.Persistence;
 
