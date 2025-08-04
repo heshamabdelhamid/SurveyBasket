@@ -44,7 +44,7 @@ public class AuthService(UserManager<ApplicationUser> userManager, IJwtProvider 
 
         return new(
             user.Id,
-            user.Email ?? string.Empty,
+            user.Email!,
             user.FirstName,
             user.LastName,
             token,
@@ -124,8 +124,5 @@ public class AuthService(UserManager<ApplicationUser> userManager, IJwtProvider 
         return true;
     }
 
-    private static string GenerateRefreshToken()
-    {
-        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-    }
+    private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 }

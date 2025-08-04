@@ -14,7 +14,10 @@ public static class PollMapping
             poll.Summary ?? string.Empty,
             poll.IsPublished,
             poll.StartsAt,
-            poll.EndsAt);
+            poll.EndsAt,
+            poll.CreatedAt,
+            poll.UpdatedAt
+        );
     }
 
     public static IEnumerable<PollResponse> ToResponse(this IEnumerable<Poll> polls)

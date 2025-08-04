@@ -6,5 +6,7 @@ public record PollResponse(
     string Notes,
     bool Published,
     DateOnly StartAt,
-    DateOnly EndAt
+    DateOnly EndAt,
+    DateTime CreatedAt,
+    DateTime? UpdatedAt
 );
