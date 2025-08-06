@@ -1,9 +1,8 @@
-using System.Reflection;
-using System.Text;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Auhentication;
@@ -11,6 +10,8 @@ using SurveyBasket.Entities;
 using SurveyBasket.Persistence;
 using SurveyBasket.Services.Auth;
 using SurveyBasket.Services.Polls;
+using System.Reflection;
+using System.Text;
 
 namespace SurveyBasket;
 
@@ -20,9 +21,25 @@ public static class DependencyInjection
     public static IServiceCollection AddDependencies(this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Add services to the container.
         services.AddControllers();
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy( builder => builder
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithOrigins(configuration.GetSection("AllowAllOrigins").Get<string[]>()!)
+            );
+        });
+
+        //services.AddCors(options =>
+        //    options.AddPolicy("AllowAllOrigins", builder => builder
+        //        .AllowAnyOrigin()    
+        //        .AllowAnyMethod()
+        //        .AllowAnyHeader()
+        //    )
+        //);
+
         services.AddOpenApi();
 
         services

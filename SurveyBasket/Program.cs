@@ -17,6 +17,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//app.UseCors("AllowAllOrigins");
+app.UseCors();
+
 app.UseAuthorization();
 
 // app.MapIdentityApi<ApplicationUser>();
