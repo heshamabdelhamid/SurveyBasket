@@ -32,6 +32,5 @@ public class CreatePollRequestValidators : AbstractValidator<CreatePollRequest>
             .WithName(nameof(UpdatePollRequest.EndsAt))
             .WithMessage("{PropertyName} At must be Greater Than or equals Starts At.");
     }
-
     private static bool HasValidDates(CreatePollRequest request) => request.EndsAt >= request.StartsAt;
 }

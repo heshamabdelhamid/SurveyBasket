@@ -6,7 +6,7 @@ using SurveyBasket.Entities;
 
 namespace SurveyBasket.Persistence;
 
-public class SurveyBasketDbContext(DbContextOptions<SurveyBasketDbContext> options, IHttpContextAccessor httpContextAccessor)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
         : IdentityDbContext<ApplicationUser>(options)
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;

@@ -10,7 +10,7 @@ using SurveyBasket.Persistence;
 
 namespace SurveyBasket.Persistence.Migrations
 {
-    [DbContext(typeof(SurveyBasketDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     partial class SurveyBasketDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

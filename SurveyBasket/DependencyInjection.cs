@@ -25,7 +25,7 @@ public static class DependencyInjection
 
         services.AddCors(options =>
         {
-            options.AddDefaultPolicy( builder => builder
+            options.AddDefaultPolicy(builder => builder
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .WithOrigins(configuration.GetSection("AllowAllOrigins").Get<string[]>()!)
@@ -73,14 +73,14 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("DefaultConnection") ??
                                throw new InvalidOperationException("Could not find connection string");
 
-        services.AddDbContext<SurveyBasketDbContext>(options => options.UseSqlServer(connectionString));
+        services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
         return services;
     }
 
     private static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>()
-            .AddEntityFrameworkStores<SurveyBasketDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>();
 
         services.AddSingleton<IJwtProvider, JwtProvider>();
 

@@ -11,7 +11,7 @@ public static class PollMapping
         return new(
             poll.Id,
             poll.Title,
-            poll.Summary ?? string.Empty,
+            poll.Summary!,
             poll.IsPublished,
             poll.StartsAt,
             poll.EndsAt,

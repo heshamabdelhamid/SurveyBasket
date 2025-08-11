@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SurveyBasket.Abstractions;
 using SurveyBasket.Contracts.Requests.Auth;
 using SurveyBasket.Services.Auth;
 
@@ -14,20 +15,39 @@ public class AuthController(IAuthService authService) : ControllerBase
     public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         var authResult = await _authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
-        return authResult is null ? BadRequest("Invalid Email/Password") : Ok(authResult);
+        return authResult.IsSuccess
+            ? Ok(authResult.Value)
+            : Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: authResult.Error.Code,
+                detail: authResult.Error.Message
+              );
     }
 
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
     {
         var authResult = await _authService.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
-        return authResult is null ? BadRequest("Invalid Token/Refresh Token") : Ok(authResult);
+        return authResult.IsSuccess 
+            ? Ok(authResult.Value) 
+            : Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: authResult.Error.Code,
+                detail: authResult.Error.Message
+              );
     }
 
     [HttpPut("revoke-refresh-token")]
     public async Task<IActionResult> RevokeRefreshTokenAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
     {
-        var isRevoked = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
-        return isRevoked ? Ok("Refresh Token revoked successfully") : BadRequest("Invalid Token/Refresh Token");
+        var result = await _authService.RevokeRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+
+        return result.IsSuccess 
+            ? Ok("Refresh Token revoked successfully")
+            : Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: result.Error.Code,
+                detail: result.Error.Message
+              );
     }
-} 
+}
