@@ -2,7 +2,7 @@
 
 namespace SurveyBasket.Abstractions;
 
-public static class ResultExtentions
+public static class ResultExtensions
 {
     public static ObjectResult ToProblem(this Result result, int statusCode)
     {
