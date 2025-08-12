@@ -28,24 +28,36 @@ public class PollService(ApplicationDbContext context) : IPollService
 
     public async Task<Result<PollResponse>> AddAsync(CreatePollRequest request, CancellationToken cancellationToken)
     {
+       var isExistingPoll = await _context.Polls.AnyAsync(x => x.Title == request.Title, cancellationToken);
+
+        if (isExistingPoll)
+            return Result.Failure<PollResponse>(PollErrors.PollAlreadyExists);
+
         var newPoll = request.ToEntity();
 
         await _context.Polls.AddAsync(newPoll, cancellationToken);
+
         await _context.SaveChangesAsync(cancellationToken);
+
         return Result.Success(newPoll.ToResponse());
     }
 
-    public async Task<Result> UpdateAsync(int id, UpdatePollRequest poll, CancellationToken cancellationToken)
+    public async Task<Result> UpdateAsync(int id, UpdatePollRequest request, CancellationToken cancellationToken)
     {
-        var existingPoll = await _context.Polls.FindAsync(id, cancellationToken);
+        var isExistingPoll = await _context.Polls.AnyAsync(x => x.Title == request.Title && x.Id != id, cancellationToken);
+
+        if (isExistingPoll)
+            return Result.Failure<PollResponse>(PollErrors.PollAlreadyExists);
+
+        var existingPoll = await _context.Polls.FindAsync([id], cancellationToken);
 
         if (existingPoll is null)
             return Result.Failure(PollErrors.PollNotFound);
 
-        existingPoll.Title = poll.Title;
-        existingPoll.Summary = poll.Description;
-        existingPoll.StartsAt = poll.StartsAt;
-        existingPoll.EndsAt = poll.EndsAt;
+        existingPoll.Title = request.Title;
+        existingPoll.Summary = request.Description;
+        existingPoll.StartsAt = request.StartsAt;
+        existingPoll.EndsAt = request.EndsAt;
 
         await _context.SaveChangesAsync(cancellationToken);
         return Result.Success();
@@ -53,7 +65,7 @@ public class PollService(ApplicationDbContext context) : IPollService
 
     public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var poll = await _context.Polls.FindAsync(id, cancellationToken);
+        var poll = await _context.Polls.FindAsync([id], cancellationToken);
 
         if (poll is null)
             return Result.Failure(PollErrors.PollNotFound);

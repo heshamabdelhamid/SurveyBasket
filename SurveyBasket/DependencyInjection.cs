@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Auhentication;
 using SurveyBasket.Entities;
+using SurveyBasket.Errors;
 using SurveyBasket.Persistence;
 using SurveyBasket.Services.Auth;
 using SurveyBasket.Services.Polls;
@@ -40,15 +41,19 @@ public static class DependencyInjection
         //    )
         //);
 
-        services.AddOpenApi();
-
         services
-            .AddScoped<IPollService, PollService>()
-            .AddScoped<IAuthService, AuthService>()
+            .AddOpenApi()
             .AddMapsterConfig()
-            .AddFluentValidationConfig()
-            .AddDatabaseConfig(configuration)
-            .AddAuthConfig(configuration);
+            .AddFluentValidationConfig();
+
+        services.AddScoped<IPollService, PollService>();
+        services.AddScoped<IAuthService, AuthService>();
+
+        services.AddDatabaseConfig(configuration);
+        services.AddAuthConfig(configuration);
+
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
 
         return services;
     }
