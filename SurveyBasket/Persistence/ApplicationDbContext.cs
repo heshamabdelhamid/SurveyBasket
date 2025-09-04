@@ -11,9 +11,19 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     public DbSet<Poll> Polls { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Answer> Answers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var cascadeFKs = modelBuilder.Model
+            .GetEntityTypes()
+            .SelectMany(t => t.GetForeignKeys())
+            .Where(fk => fk.DeleteBehavior == DeleteBehavior.Cascade && !fk.IsOwnership);
+            
+        foreach (var foreignKey in cascadeFKs)
+            foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
     }

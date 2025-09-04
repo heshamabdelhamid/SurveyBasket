@@ -50,13 +50,12 @@ public class PollsController(IPollService pollService) : ControllerBase
     {
         var result = await _pollService.UpdateAsync(id, request, cancellationToken);
 
-        if (result.Error == PollErrors.PollNotFound)
-            return result.ToProblem(StatusCodes.Status404NotFound);
+        if (result.IsSuccess)
+            return NoContent();
 
-        if (result.Error == PollErrors.PollAlreadyExists)
-            return result.ToProblem(StatusCodes.Status409Conflict);
-
-        return NoContent();
+        return result.Error.Equals(PollErrors.PollNotFound)
+            ? result.ToProblem(StatusCodes.Status404NotFound)
+            : result.ToProblem(StatusCodes.Status409Conflict);
     }
 
     [HttpDelete("{id}")]

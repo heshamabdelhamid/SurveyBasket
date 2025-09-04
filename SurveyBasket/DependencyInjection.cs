@@ -1,8 +1,9 @@
 using FluentValidation;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Auhentication;
@@ -11,6 +12,7 @@ using SurveyBasket.Errors;
 using SurveyBasket.Persistence;
 using SurveyBasket.Services.Auth;
 using SurveyBasket.Services.Polls;
+using SurveyBasket.Services.Question;
 using System.Reflection;
 using System.Text;
 
@@ -18,7 +20,6 @@ namespace SurveyBasket;
 
 public static class DependencyInjection
 {
-
     public static IServiceCollection AddDependencies(this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -48,6 +49,7 @@ public static class DependencyInjection
 
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IQuestionService, QuestionService>();
 
         services.AddDatabaseConfig(configuration);
         services.AddAuthConfig(configuration);
@@ -61,9 +63,9 @@ public static class DependencyInjection
     private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
     {
         //Add mapster
-        //var MappingConfig = TypeAdapterConfig.GlobalSettings;
-        //MappingConfig.Scan (Assembly.GetExecutingAssembly());
-        //services.AddSingleton<IMapper>(new Mapper(MappingConfig));
+        var MappingConfig = TypeAdapterConfig.GlobalSettings;
+        MappingConfig.Scan(Assembly.GetExecutingAssembly());
+        services.AddSingleton<IMapper>(new Mapper(MappingConfig));
         return services;
     }
 
@@ -118,5 +120,5 @@ public static class DependencyInjection
         });
 
         return services;
-    }
+    }   
 }

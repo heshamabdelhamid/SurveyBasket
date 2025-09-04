@@ -19,9 +19,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         };
 
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken: cancellationToken);
-     
         return true;
     }
 }
