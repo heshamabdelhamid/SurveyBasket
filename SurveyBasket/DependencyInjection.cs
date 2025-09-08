@@ -13,6 +13,7 @@ using SurveyBasket.Persistence;
 using SurveyBasket.Services.Auth;
 using SurveyBasket.Services.Polls;
 using SurveyBasket.Services.Question;
+using SurveyBasket.Services.Votes;
 using System.Reflection;
 using System.Text;
 
@@ -50,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IQuestionService, QuestionService>();
+        services.AddScoped<IVoteService, VoteService>();
 
         services.AddDatabaseConfig(configuration);
         services.AddAuthConfig(configuration);

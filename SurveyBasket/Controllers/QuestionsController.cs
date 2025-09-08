@@ -18,19 +18,14 @@ namespace SurveyBasket.Controllers
         public async Task<IActionResult> GetAll([FromRoute] int pollId, CancellationToken cancellationToken)
         {
             var result = await questionService.GetAllAsync(pollId, cancellationToken);
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
         [HttpGet("{questionId}")]
         public async Task<IActionResult> Get([FromRoute] int pollId, [FromRoute] int questionId, CancellationToken cancellationToken)
         {
             var result = await questionService.GetAsync(pollId, questionId, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
         [HttpPost("")]
@@ -38,35 +33,21 @@ namespace SurveyBasket.Controllers
             CancellationToken cancellationToken)
         {
             var result = await questionService.AddAsync(pollId, request, cancellationToken);
-
-            if (result.IsSuccess)
-                return NoContent();
-
-            return result.Error.Equals(QuestionErrors.QuestionNotFound)
-                ? result.ToProblem(StatusCodes.Status404NotFound)
-                : result.ToProblem(StatusCodes.Status409Conflict);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 
         [HttpPut("{questionId}")]
         public async Task<IActionResult> UpdateAsync([FromRoute] int pollId, [FromRoute] int questionId, [FromBody] UpdateQuestionRequest request, CancellationToken cancellationToken)
         {
             var result = await questionService.UpdateAsync(pollId, questionId, request, cancellationToken);
-
-            if (result.IsSuccess)
-                return NoContent();
-
-            return result.Error.Equals(QuestionErrors.QuestionNotFound)
-                ? result.ToProblem(StatusCodes.Status404NotFound)
-                : result.ToProblem(StatusCodes.Status409Conflict);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 
         [HttpPatch("{questionId}")]
         public async Task<IActionResult> ToggleStatusAsync([FromRoute] int pollId, [FromRoute] int questionId, CancellationToken cancellationToken)
         {
             var result = await questionService.ToggleStatusAsync(pollId, questionId, cancellationToken);
-            return result.IsSuccess
-                ? NoContent()
-                : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
         }
     }
 }
