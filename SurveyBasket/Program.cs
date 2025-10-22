@@ -8,7 +8,6 @@ builder.Services.AddDependencies(builder.Configuration);
 // builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
 //     .AddEntityFrameworkStores<SurveyBasketDbContext>();
 
-
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration)
 );

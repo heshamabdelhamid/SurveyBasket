@@ -12,8 +12,23 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
     private readonly IAuthService _authService = authService;
     private readonly ILogger _logger = logger;
 
-    [HttpPost]
-    public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request, CancellationToken cancellationToken)
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
+    {
+        var authResult = await _authService.RegisterAsync(request, cancellationToken);
+        return authResult.IsSuccess ? Ok() : authResult.ToProblem();
+    }
+
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> EmailConfirm([FromBody] ConfirmEmailRequest request)
+    {
+        var authResult = await _authService.ConfirmEmailAsync(request);
+        return authResult.IsSuccess ? Ok() : authResult.ToProblem();
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         var authResult = await _authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
         return authResult.IsSuccess ? Ok(authResult.Value) : authResult.ToProblem();
