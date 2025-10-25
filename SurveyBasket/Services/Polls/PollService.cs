@@ -1,18 +1,20 @@
-﻿using Mapster;
+﻿using Hangfire;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using SurveyBasket.Abstractions;
 using SurveyBasket.Contracts.Requests.Polls;
 using SurveyBasket.Contracts.Responses.Polls;
-using SurveyBasket.Entities;
 using SurveyBasket.Errors;
 using SurveyBasket.Mapping;
 using SurveyBasket.Persistence;
+using SurveyBasket.Services.Notification;
 
 namespace SurveyBasket.Services.Polls;
 
-public class PollService(ApplicationDbContext context) : IPollService
+public class PollService(ApplicationDbContext context, INotificationService notificationService) : IPollService
 {
     private readonly ApplicationDbContext _context = context;
+    private readonly INotificationService _notificationService = notificationService;
 
     public async Task<IEnumerable<PollResponse>> GetAllAsync(CancellationToken cancellationToken)
     {
@@ -102,7 +104,11 @@ public class PollService(ApplicationDbContext context) : IPollService
             return Result.Failure(PollErrors.PollNotFound);
 
         poll.IsPublished = !poll.IsPublished;
+        
         await _context.SaveChangesAsync(cancellationToken);
+
+        if (!poll.IsPublished && poll.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
+            BackgroundJob.Enqueue(() => _notificationService.SendNewPollNotification(id));
 
         return Result.Success();
     }

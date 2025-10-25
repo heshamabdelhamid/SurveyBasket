@@ -1,4 +1,5 @@
 using FluentValidation;
+using Hangfire;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,8 +26,7 @@ namespace SurveyBasket;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDependencies(this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
 
@@ -49,10 +49,10 @@ public static class DependencyInjection
         //    )
         //);
 
-        services
-            .AddOpenApi()
-            .AddMapsterConfig()
-            .AddFluentValidationConfig();
+        services.AddOpenApi();
+        services.AddMapsterConfig();
+        services.AddFluentValidationConfig();
+        services.AddBackgroundJobsConfig(configuration);
 
         services.AddScoped<IPollService, PollService>();
         services.AddScoped<IAuthService, AuthService>();
@@ -60,7 +60,6 @@ public static class DependencyInjection
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<IResultService, ResultService>();
         services.AddScoped<IEmailSender, EmailService>();
-
 
         services.AddDatabaseConfig(configuration);
         services.AddAuthConfig(configuration);
@@ -71,7 +70,6 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         
         services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
-
 
         return services;
     }
@@ -144,5 +142,20 @@ public static class DependencyInjection
         });
 
         return services;
-    }   
+    }
+
+    private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection")));
+
+        services.AddHangfireServer();
+
+        //services.AddMvc();
+        return services;
+    }
+
 }
