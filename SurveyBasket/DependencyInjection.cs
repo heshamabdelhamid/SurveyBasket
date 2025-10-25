@@ -3,6 +3,7 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
@@ -10,11 +11,13 @@ using SurveyBasket.Auhentication;
 using SurveyBasket.Entities;
 using SurveyBasket.Errors;
 using SurveyBasket.Persistence;
+using SurveyBasket.Services;
 using SurveyBasket.Services.Auth;
 using SurveyBasket.Services.Polls;
 using SurveyBasket.Services.Question;
 using SurveyBasket.Services.Results;
 using SurveyBasket.Services.Votes;
+using SurveyBasket.Settings;
 using System.Reflection;
 using System.Text;
 
@@ -56,12 +59,19 @@ public static class DependencyInjection
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<IResultService, ResultService>();
+        services.AddScoped<IEmailSender, EmailService>();
+
 
         services.AddDatabaseConfig(configuration);
         services.AddAuthConfig(configuration);
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
+
+        services.AddHttpContextAccessor();
+        
+        services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+
 
         return services;
     }

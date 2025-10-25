@@ -21,9 +21,16 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
     }
 
     [HttpPost("confirm-email")]
-    public async Task<IActionResult> EmailConfirm([FromBody] ConfirmEmailRequest request)
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
     {
         var authResult = await _authService.ConfirmEmailAsync(request);
+        return authResult.IsSuccess ? Ok() : authResult.ToProblem();
+    }
+
+    [HttpPost("resend-confirmation-email")]
+    public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailRequest request)
+    {
+        var authResult = await _authService.ResendConfirmationEmailAsync(request);
         return authResult.IsSuccess ? Ok() : authResult.ToProblem();
     }
 
