@@ -14,7 +14,9 @@ using SurveyBasket.Errors;
 using SurveyBasket.Persistence;
 using SurveyBasket.Services;
 using SurveyBasket.Services.Auth;
+using SurveyBasket.Services.Notification;
 using SurveyBasket.Services.Polls;
+using SurveyBasket.Services.Profile;
 using SurveyBasket.Services.Question;
 using SurveyBasket.Services.Results;
 using SurveyBasket.Services.Votes;
@@ -60,6 +62,8 @@ public static class DependencyInjection
         services.AddScoped<IVoteService, VoteService>();
         services.AddScoped<IResultService, ResultService>();
         services.AddScoped<IEmailSender, EmailService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IProfileService, ProfileService>();
 
         services.AddDatabaseConfig(configuration);
         services.AddAuthConfig(configuration);
