@@ -5,31 +5,33 @@ using SurveyBasket.Abstractions;
 using SurveyBasket.Contracts.Requests.Users.Profile;
 using SurveyBasket.Contracts.Responses.Users.Profile;
 using SurveyBasket.Entities;
-using SurveyBasket.Persistence;
 
-namespace SurveyBasket.Services.Profile;
-
-public class ProfileService(UserManager<ApplicationUser> userManager) : IProfileService
-{
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
-
-    public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
+namespace SurveyBasket.Services.Profile 
+{ 
+    public class ProfileService(UserManager<ApplicationUser> userManager) : IProfileService
     {
-        var user = await _userManager.Users
-            .Where(x => x.Id == userId)
-            .ProjectToType<UserProfileResponse>()
-            .SingleAsync();
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
-        return Result.Success(user);
+        public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
+        {
+            var user = await _userManager.Users
+                .Where(x => x.Id == userId)
+                .ProjectToType<UserProfileResponse>()
+                .SingleAsync();
+
+            return Result.Success(user);
+        }
+
+        public async Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request)
+        {
+            await _userManager.Users
+                .Where(x => x.Id == userId)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(u => u.FirstName, request.FirstName)
+                    .SetProperty(u => u.LastName, request.LastName)
+                );
+
+            return Result.Success();
+        }
     }
-
-    public async Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request)
-    {
-        var user = await _userManager.FindByIdAsync(userId);
-
-        await _userManager.UpdateAsync(request.Adapt(user)!);
-
-        return Result.Success();
-    }
-
 }

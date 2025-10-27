@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
@@ -34,7 +35,7 @@ public class AuthService(
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private readonly int _refreshTokenExpiryDays = 14;
 
-    public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken)
     {
         var emailIsExisiting = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
 
@@ -128,7 +129,7 @@ public class AuthService(
         return Result.Failure<AuthResponse>(result.IsNotAllowed ? UserErrors.EmailNotConfirmed : UserErrors.InvalidCredentials);
     }
 
-    public async Task<Result<AuthResponse>>  GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken)
+    public async Task<Result<AuthResponse>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken)
     { 
         var userId = _jwtProvider.ValidateToken(token);
 
@@ -176,7 +177,7 @@ public class AuthService(
         );
     }
 
-    public async Task<Result> RevokeRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
+    public async Task<Result> RevokeRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken)
     {
         var userId = _jwtProvider.ValidateToken(token);
 
@@ -203,7 +204,6 @@ public class AuthService(
     {
         if (await _userManager.FindByEmailAsync(request.Email) is not {} user)
             return Result.Success();
-        //return Result.Failure(UserErrors.UserNotFound);
 
         if (user.EmailConfirmed)
             return Result.Failure(UserErrors.EmailAlreadyConfirmed);
@@ -218,8 +218,67 @@ public class AuthService(
         return Result.Success();
     }
 
-    private static string GenerateRefreshToken() => 
-        Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+    public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        var result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword, request.NewPassword);
+
+        if (result.Succeeded)
+            return Result.Success();
+
+        var error = result.Errors.First();
+
+        return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+    }
+
+    public async Task<Result> SendForgotPasswordCodeAsync(ForgetPasswordRequest request)
+    {
+        if (await _userManager.FindByEmailAsync(request.Email) is not { } user)
+            return Result.Success();
+
+        if (!user.EmailConfirmed)
+            return Result.Failure(UserErrors.EmailNotConfirmed);
+
+        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+        _logger.LogInformation(" Reset code is {Code}", code);
+
+        await SendResetPasswordEmail(user, code);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user is null || !user.EmailConfirmed)
+            return Result.Failure(UserErrors.InvalidCode);
+
+        IdentityResult result;
+
+        try
+        {
+            result = await _userManager.ResetPasswordAsync(
+                user,
+                Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code)),
+                request.NewPassword
+            );
+        }
+        catch (FormatException)
+        {
+            result = IdentityResult.Failed(_userManager.ErrorDescriber.InvalidToken());
+        }
+
+        if (result.Succeeded)
+            return Result.Success();
+
+        var error = result.Errors.First();
+
+        return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status401Unauthorized));
+    }
 
     private async Task SendConfirmationEmail(ApplicationUser user, string code)
     {
@@ -238,5 +297,29 @@ public class AuthService(
         );
 
         await Task.CompletedTask;
+    }
+
+    private async Task SendResetPasswordEmail(ApplicationUser user, string code)
+    {
+        var origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
+
+        var emailBody = EmailBodyBuilder.GenerateEmailBody("ForgetPassword",
+            templateModel: new Dictionary<string, string>
+            {
+                { "{{name}}", user.FirstName },
+                { "{{action_url}}", $"{origin}/auth/forgetPassword?email={user.Email}&code={code}" }
+            }
+        );
+
+        BackgroundJob.Enqueue(() =>
+            _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: ChangePassword", emailBody)
+        );
+
+        await Task.CompletedTask;
+    }
+
+    private static string GenerateRefreshToken()
+    {
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 }
