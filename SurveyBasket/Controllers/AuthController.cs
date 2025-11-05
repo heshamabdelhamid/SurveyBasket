@@ -19,7 +19,7 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
         var authResult = await _authService.RegisterAsync(request, cancellationToken);
-        
+
         return authResult.IsSuccess ? Ok() : authResult.ToProblem();
     }
 
@@ -35,7 +35,7 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
     public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailRequest request)
     {
         var authResult = await _authService.ResendConfirmationEmailAsync(request);
-        
+
         return authResult.IsSuccess ? Ok() : authResult.ToProblem();
     }
 

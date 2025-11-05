@@ -42,7 +42,7 @@ public class PollsController(IPollService pollService) : ControllerBase
     {
         var result = await _pollService.AddAsync(request, cancellationToken);
 
-        return result.IsSuccess 
+        return result.IsSuccess
             ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
             : result.ToProblem();
     }

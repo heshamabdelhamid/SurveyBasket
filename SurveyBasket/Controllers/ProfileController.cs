@@ -25,7 +25,7 @@ public class ProfileController(IProfileService userService) : ControllerBase
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
     {
         await _profileService.UpdateProfileAsync(User.GetUserId()!, request);
-        
+
         return NoContent();
     }
 

@@ -22,6 +22,7 @@ using SurveyBasket.Services.Polls;
 using SurveyBasket.Services.Profile;
 using SurveyBasket.Services.Question;
 using SurveyBasket.Services.Results;
+using SurveyBasket.Services.Roles;
 using SurveyBasket.Services.Votes;
 using SurveyBasket.Settings;
 using System.Reflection;
@@ -67,6 +68,7 @@ public static class DependencyInjection
         services.AddScoped<IEmailSender, EmailService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IProfileService, ProfileService>();
+        services.AddScoped<IRoleService, RoleService>();
 
         services.AddDatabaseConfig(configuration);
         services.AddAuthConfig(configuration);
