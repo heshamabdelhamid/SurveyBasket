@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SurveyBasket.Abstractions;
-using SurveyBasket.Contracts.Requests.Users.Profile;
-using SurveyBasket.Contracts.Responses.Users.Profile;
+using SurveyBasket.Contracts.Requests.Profile;
+using SurveyBasket.Contracts.Responses.Profile;
 using SurveyBasket.Entities;
 
 namespace SurveyBasket.Services.Profile 

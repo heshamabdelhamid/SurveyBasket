@@ -1,4 +1,4 @@
-﻿namespace SurveyBasket.Contracts.Responses.Users.Profile;
+﻿namespace SurveyBasket.Contracts.Responses.Profile;
 
 public record UserProfileResponse(
     string Email,

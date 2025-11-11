@@ -16,7 +16,6 @@ using SurveyBasket.Persistence;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 
 namespace SurveyBasket.Services.Auth;
 
@@ -42,9 +41,9 @@ public class AuthService(
 
     public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken)
     {
-        var emailIsExisiting = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+        var emailIsExisting = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
 
-        if (emailIsExisiting)
+        if (emailIsExisting)
             return Result.Failure(UserErrors.EmailDuplicate);
 
         var user = request.Adapt<ApplicationUser>();
@@ -103,7 +102,10 @@ public class AuthService(
         if (await _userManager.FindByEmailAsync(email) is not { } user)
             return Result.Failure<AuthResponse>(UserErrors.UserNotFound);
 
-        var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
+        if (user.IsDisabled)
+            return Result.Failure<AuthResponse>(UserErrors.DisabledUser);
+        
+        var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
 
         if (result.Succeeded)
         {
@@ -135,7 +137,13 @@ public class AuthService(
             ));
         }
 
-        return Result.Failure<AuthResponse>(result.IsNotAllowed ? UserErrors.EmailNotConfirmed : UserErrors.InvalidCredentials);
+        var error = result.IsNotAllowed
+            ? UserErrors.EmailNotConfirmed
+            : result.IsLockedOut
+                ? UserErrors.LockedUser
+                : UserErrors.InvalidCredentials;
+
+        return Result.Failure<AuthResponse>(error);
     }
 
     public async Task<Result<AuthResponse>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken)
@@ -149,6 +157,12 @@ public class AuthService(
 
         if (user is null)
             return Result.Failure<AuthResponse>(UserErrors.InvalidToken);
+        
+        if (user.IsDisabled)
+            return Result.Failure<AuthResponse>(UserErrors.DisabledUser);
+        
+        if (user.LockoutEnd > DateTime.UtcNow)
+            return Result.Failure<AuthResponse>(UserErrors.LockedUser);
 
         var existingRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken && x.IsActive);
 

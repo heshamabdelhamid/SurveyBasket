@@ -27,9 +27,9 @@ public class RoleService(
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Result<RoleDetailsResponse>> GetAsync(string Id)
+    public async Task<Result<RoleDetailsResponse>> GetAsync(string id)
     {
-        if (await _roleManager.FindByIdAsync(Id) is not { } role)
+        if (await _roleManager.FindByIdAsync(id) is not { } role)
             return Result.Failure<RoleDetailsResponse>(RoleErrors.RoleNotFound);
 
         var permissions = await _roleManager.GetClaimsAsync(role);
@@ -126,7 +126,7 @@ public class RoleService(
 
             await _context.AddRangeAsync(newPermissions, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-
+            
             return Result.Success();
         }
 

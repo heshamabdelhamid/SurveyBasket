@@ -1,6 +1,6 @@
 ﻿using SurveyBasket.Abstractions;
-using SurveyBasket.Contracts.Requests.Users.Profile;
-using SurveyBasket.Contracts.Responses.Users.Profile;
+using SurveyBasket.Contracts.Requests.Profile;
+using SurveyBasket.Contracts.Responses.Profile;
 
 namespace SurveyBasket.Services.Profile;
 

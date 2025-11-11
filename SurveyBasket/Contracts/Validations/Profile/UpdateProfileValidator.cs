@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using SurveyBasket.Contracts.Requests.Users.Profile;
+using SurveyBasket.Contracts.Requests.Profile;
 
-namespace SurveyBasket.Contracts.Validations.Users.Profile;
+namespace SurveyBasket.Contracts.Validations.Profile;
 
 public class UpdateProfileValidator : AbstractValidator<UpdateProfileRequest>
 {

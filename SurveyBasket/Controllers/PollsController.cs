@@ -20,13 +20,17 @@ public class PollsController(IPollService pollService) : ControllerBase
 
     [HttpGet("")]
     [HasPermission(Permissions.GetPolls)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken) =>
-        Ok(await _pollService.GetAllAsync(cancellationToken));
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        return Ok(await _pollService.GetAllAsync(cancellationToken));
+    }
 
     [HttpGet("current")]
     [Authorize(Roles = DefaultRoles.Member)]
-    public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken) =>
-        Ok(await _pollService.GetCurrentAsync(cancellationToken));
+    public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
+    {
+        return Ok(await _pollService.GetCurrentAsync(cancellationToken));
+    }
 
     [HttpGet("{id}")]
     [HasPermission(Permissions.GetPolls)]

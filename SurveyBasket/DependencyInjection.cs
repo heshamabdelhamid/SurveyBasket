@@ -23,6 +23,7 @@ using SurveyBasket.Services.Profile;
 using SurveyBasket.Services.Question;
 using SurveyBasket.Services.Results;
 using SurveyBasket.Services.Roles;
+using SurveyBasket.Services.Users;
 using SurveyBasket.Services.Votes;
 using SurveyBasket.Settings;
 using System.Reflection;
@@ -60,15 +61,7 @@ public static class DependencyInjection
         services.AddFluentValidationConfig();
         services.AddBackgroundJobsConfig(configuration);
 
-        services.AddScoped<IPollService, PollService>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IQuestionService, QuestionService>();
-        services.AddScoped<IVoteService, VoteService>();
-        services.AddScoped<IResultService, ResultService>();
-        services.AddScoped<IEmailSender, EmailService>();
-        services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IProfileService, ProfileService>();
-        services.AddScoped<IRoleService, RoleService>();
+        services.AddOurServices();
 
         services.AddDatabaseConfig(configuration);
         services.AddAuthConfig(configuration);
@@ -86,9 +79,9 @@ public static class DependencyInjection
     private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
     {
         //Add mapster
-        var MappingConfig = TypeAdapterConfig.GlobalSettings;
-        MappingConfig.Scan(Assembly.GetExecutingAssembly());
-        services.AddSingleton<IMapper>(new Mapper(MappingConfig));
+        var mappingConfig = TypeAdapterConfig.GlobalSettings;
+        mappingConfig.Scan(Assembly.GetExecutingAssembly());
+        services.AddSingleton<IMapper>(new Mapper(mappingConfig));
         return services;
     }
 
@@ -167,6 +160,21 @@ public static class DependencyInjection
         services.AddHangfireServer();
 
         //services.AddMvc();
+        return services;
+    }
+
+    private static IServiceCollection AddOurServices(this IServiceCollection services)
+    {
+        services.AddScoped<IPollService, PollService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IQuestionService, QuestionService>();
+        services.AddScoped<IVoteService, VoteService>();
+        services.AddScoped<IResultService, ResultService>();
+        services.AddScoped<IEmailSender, EmailService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IProfileService, ProfileService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IUserService , UserService>();
         return services;
     }
 

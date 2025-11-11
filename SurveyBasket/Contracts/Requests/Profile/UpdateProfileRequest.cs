@@ -1,4 +1,4 @@
-﻿namespace SurveyBasket.Contracts.Requests.Users.Profile;
+﻿namespace SurveyBasket.Contracts.Requests.Profile;
 
 public record UpdateProfileRequest(
     string FirstName,

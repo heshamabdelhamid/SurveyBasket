@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SurveyBasket.Contracts.Requests.Users.Profile;
+using SurveyBasket.Contracts.Requests.Profile;
 using SurveyBasket.Extensions;
 using SurveyBasket.Services.Profile;
 
