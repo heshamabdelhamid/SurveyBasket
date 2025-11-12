@@ -108,4 +108,39 @@ public class UserService(
 
         return Result.Failure<UserResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
     }
+
+    public async Task<Result> UpdateUserAsync(UpdateUserRequest request, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(request.Id);
+
+        if (user is null)
+            return Result.Failure(UserErrors.UserNotFound);
+
+        var EmailIsExisting = await _context.Users.AnyAsync(x => x.Id != request.Id && x.Email == request.Email, cancellationToken);
+
+        if (EmailIsExisting)
+            return Result.Failure(UserErrors.EmailDuplicate);
+
+        var allowedRoles = await _roleService.GetAllAsync(false, cancellationToken);
+
+        if (request.Roles.Except(allowedRoles.Select(x => x.Name)).Any())
+            return Result.Failure(RoleErrors.InvalidRoles);
+
+        user = request.Adapt(user);
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
+        {
+            await _context.UserRoles.Where(x => x.UserId == request.Id).ExecuteDeleteAsync(cancellationToken);
+            await _userManager.AddToRolesAsync(user, request.Roles);
+            return Result.Success();
+        }
+
+        var error = result.Errors.First();
+
+        return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+    }
+
+
 }
